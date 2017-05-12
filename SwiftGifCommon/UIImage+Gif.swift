@@ -31,7 +31,7 @@ extension UIImage {
             return nil
         }
 
-        return UIImage.animatedImageWithSource(source)
+        return UIImage.animatedImageWithSource(source, delay: delay)
     }
 
     public class func gif(url: String, delay: Double = 0.1) -> UIImage? {
