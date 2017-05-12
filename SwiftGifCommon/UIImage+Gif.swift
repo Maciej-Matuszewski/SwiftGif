@@ -24,7 +24,7 @@ extension UIImageView {
 
 extension UIImage {
 
-    public class func gif(data: Data) -> UIImage? {
+    public class func gif(data: Data, delay: Double = 0.1) -> UIImage? {
         // Create source from data
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
             print("SwiftGif: Source for the image does not exist")
@@ -34,7 +34,7 @@ extension UIImage {
         return UIImage.animatedImageWithSource(source)
     }
 
-    public class func gif(url: String) -> UIImage? {
+    public class func gif(url: String, delay: Double = 0.1) -> UIImage? {
         // Validate URL
         guard let bundleURL = URL(string: url) else {
             print("SwiftGif: This image named \"\(url)\" does not exist")
@@ -47,10 +47,10 @@ extension UIImage {
             return nil
         }
 
-        return gif(data: imageData)
+        return gif(data: imageData, delay: delay)
     }
 
-    public class func gif(name: String) -> UIImage? {
+    public class func gif(name: String, delay: Double = 0.1) -> UIImage? {
         // Check for existance of gif
         guard let bundleURL = Bundle.main
           .url(forResource: name, withExtension: "gif") else {
@@ -64,11 +64,11 @@ extension UIImage {
             return nil
         }
 
-        return gif(data: imageData)
+        return gif(data: imageData, delay: delay)
     }
 
-    internal class func delayForImageAtIndex(_ index: Int, source: CGImageSource!) -> Double {
-        var delay = 0.1
+    internal class func delayForImageAtIndex(_ index: Int, source: CGImageSource!, customDelay: Double) -> Double {
+        var delay = customDelay
 
         // Get dictionaries
         let cfProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil)
@@ -91,8 +91,8 @@ extension UIImage {
 
         delay = delayObject as? Double ?? 0
 
-        if delay < 0.1 {
-            delay = 0.1 // Make sure they're not too fast
+        if delay < customDelay {
+            delay = customDelay // Make sure they're not too fast
         }
 
         return delay
@@ -147,7 +147,7 @@ extension UIImage {
         return gcd
     }
 
-    internal class func animatedImageWithSource(_ source: CGImageSource) -> UIImage? {
+    internal class func animatedImageWithSource(_ source: CGImageSource, delay: Double = 0.1) -> UIImage? {
         let count = CGImageSourceGetCount(source)
         var images = [CGImage]()
         var delays = [Int]()
@@ -161,7 +161,7 @@ extension UIImage {
 
             // At it's delay in cs
             let delaySeconds = UIImage.delayForImageAtIndex(Int(i),
-                source: source)
+                source: source, customDelay: delay)
             delays.append(Int(delaySeconds * 1000.0)) // Seconds to ms
         }
 
